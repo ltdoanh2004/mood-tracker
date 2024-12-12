@@ -1,26 +1,42 @@
-import { View ,Text, StyleSheet, Platform } from 'react-native';
-import React from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import MessageBox from '@/components/MessageBox';
+import React, { useState } from "react";
+import { StyleSheet, View, ScrollView } from "react-native";
+import { format } from "date-fns";
+import MoodSelector from "@/components/MoodSelector";
+import MoodHistory from "@/components/MoodHistory";
+import DatePicker from "@/components/DatePicker";
 
-export default function HomeScreen() {
+export default function Home() {
+  const [moodHistory, setMoodHistory] = useState({});
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
+  const handleMoodSelect = (mood) => {
+    const dateKey = format(selectedDate, "yyyy-MM-dd");
+    setMoodHistory((prevHistory) => ({
+      ...prevHistory,
+      [dateKey]: mood,
+    }));
+  };
+
   return (
-    <SafeAreaView>
-      <View style={styles.container}>
-        <Text>Home Screen</Text>
-        <MessageBox />
+    <ScrollView style={styles.container}>
+      <View style={styles.content}>
+        <DatePicker
+          selectedDate={selectedDate}
+          onDateChange={setSelectedDate}
+        />
+        <MoodSelector onMoodSelect={handleMoodSelect} />
+        <MoodHistory moodHistory={moodHistory} />
       </View>
-      
-    </SafeAreaView>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flex: 1,
+    backgroundColor: "#f5f5f5",
   },
-  
+  content: {
+    padding: 20,
+  },
 });
