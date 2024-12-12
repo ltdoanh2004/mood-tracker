@@ -9,7 +9,7 @@ export default function Home() {
   const [moodHistory, setMoodHistory] = useState({});
   const [selectedDate, setSelectedDate] = useState(new Date());
 
-  const handleMoodSelect = (mood) => {
+  const handleMoodSelect = (mood:any) => {
     const dateKey = format(selectedDate, "yyyy-MM-dd");
     setMoodHistory((prevHistory) => ({
       ...prevHistory,
