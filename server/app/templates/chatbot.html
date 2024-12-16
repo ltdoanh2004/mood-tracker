@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1 class="header-title"> 
+                <img src="../static/css/polar-bear.png"> 
+                YouCare ChatBot
+            </h1>
+        </div>
+
+        <div id="chat-box" class="chat-box">
+            <!-- Welcome message -->
+            <div class="message bot-message">
+                <div class="avatar">
+                    <div class="bot-avatar">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23A8D5BA'/%3E%3Ctext x='50' y='60' font-family='Arial' font-size='40' fill='%23FFB6C1' text-anchor='middle'%3E🤖%3C/text%3E%3C/svg%3E" alt="Robot Avatar">
+                    </div>
+                </div>
+                <div class="message-content">
+                    Xin hào, tôi là FITSY. Bạn cần tôi giúp gì ạ.
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-input">
+            <form id="chat-form">
+                <input type="text" id="user-input" placeholder="Type a message..." required />
+                <button type="submit">Send</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById("chat-form");
+        const chatBox = document.getElementById("chat-box");
+        const userInput = document.getElementById("user-input");
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+        
+            const userMessage = userInput.value;
+            appendMessage("You", userMessage, "user-message");
+            
+            const typingIndicator = document.createElement("div");
+            typingIndicator.className = "typing-indicator";
+            typingIndicator.innerHTML = `
+                <div class="avatar">
+                    <div class="bot-avatar">
+                        <img src="data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 13.5C12.8284 13.5 13.5 12.8284 13.5 12C13.5 11.1716 12.8284 10.5 12 10.5C11.1716 10.5 10.5 11.1716 10.5 12C10.5 12.8284 11.1716 13.5 12 13.5Z' fill='white'/%3E%3Cpath d='M6.5 13.5C7.32843 13.5 8 12.8284 8 12C8 11.1716 7.32843 10.5 6.5 10.5C5.67157 10.5 5 11.1716 5 12C5 12.8284 5.67157 13.5 6.5 13.5Z' fill='white'/%3E%3Cpath d='M17.5 13.5C18.3284 13.5 19 12.8284 19 12C19 11.1716 18.3284 10.5 17.5 10.5C16.6716 10.5 16 11.1716 16 12C16 12.8284 16.6716 13.5 17.5 13.5Z' fill='white'/%3E%3C/svg%3E" alt="Bot">
+                    </div>
+                </div>
+                <div class="message-content">đang nhập<span>.</span><span>.</span><span>.</span></div>
+            `;
+            chatBox.appendChild(typingIndicator);
+            
+            chatBox.scrollTop = chatBox.scrollHeight;
+            
+            try {
+                const response = await fetch("/chatbot/openai", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        inputs: userMessage
+                    })
+                });
+
+                typingIndicator.remove();
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    appendMessage("Bot", `Error: ${errorData.detail}`, "bot-message");
+                    return;
+                }
+
+                const data = await response.json();
+                appendMessage("Bot", data.response, "bot-message");
+            } catch (error) {
+                typingIndicator.remove();
+                appendMessage("Bot", "An error occurred while contacting the server.", "bot-message");
+            }
+
+            userInput.value = "";
+            chatBox.scrollTop = chatBox.scrollHeight;
+        });
+
+        function appendMessage(sender, message, messageType) {
+            const messageDiv = document.createElement("div");
+            messageDiv.classList.add("message", messageType);
+            
+            if (messageType === "bot-message") {
+                messageDiv.innerHTML = `
+                    <div class="avatar">
+                        <div class="bot-avatar">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23A8D5BA'/%3E%3Ctext x='50' y='60' font-family='Arial' font-size='40' fill='%23FFB6C1' text-anchor='middle'%3E🤖%3C/text%3E%3C/svg%3E" alt="Robot Avatar">
+                        </div>
+                    </div>
+                    <div class="message-content">${message}</div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="message-content">${message}</div>
+                `;
+            }
+            
+            chatBox.appendChild(messageDiv);
+        }
+    </script>
+</body>
+</html>
