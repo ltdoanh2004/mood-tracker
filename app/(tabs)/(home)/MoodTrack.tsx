@@ -64,12 +64,12 @@ export default function MoodTracker({}) {
   let today = new Date();
   const [selected, setSelected] = useState<DateType>(today);
 
-  const snapPoints = useMemo(() => ["25%", "50%", "75%", "100%"], []);
+  const snapPoints = useMemo(() => ["50%", "75%"], []);
 
   const handleSheetChanges = useCallback((index: number) => {}, []);
 
   const openBottomSheet = () => {
-    bottomSheetRef.current?.snapToIndex(3);
+    bottomSheetRef.current?.snapToIndex(1);
   };
 
   const closeBottomSheet = () => {

@@ -14,7 +14,18 @@ export default function Layout() {
         headerShown: false,
       }}
     >
-      <Stack.Screen name="index" />
+      <Stack.Screen
+        name="index"
+        options={{
+          headerTitle: "Home",
+          headerLargeTitle: true,
+          headerShown: true,
+          headerStyle: {
+            backgroundColor: "white",
+          },
+          headerTintColor: "black",
+        }}
+      />
       <Stack.Screen name="MoodTrack" />
     </Stack>
   );
