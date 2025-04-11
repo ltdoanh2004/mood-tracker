@@ -6,6 +6,8 @@ from app.services.session_service import get_session_context, save_session_conte
 
 from app.logger import logger
 
+
+from app.utils.promt_engineering import create_system_prompt
 router = APIRouter()
 
 @router.post("/openai", response_model=ChatResponse)
@@ -23,7 +25,7 @@ async def openai_embedding(request: ChatRequest, session_id: str = None):
     parameters = request.parameters if request.parameters else default_parameters
 
     logger.info(f"Received OpenAI request with input: {request.inputs}, session_context: {session_context}")
-
+    request.inputs = create_system_prompt() + request.inputs
     try:
         response_data = await get_openai_response(request.inputs, parameters, session_context)
     except Exception as e:
